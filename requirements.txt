@@ -1,0 +1,61 @@
+# Core deep learning libraries
+torch==2.7.0
+torchvision==0.15.2+cu117
+torchaudio==2.0.2+cu117
+
+# Hugging Face ecosystem
+transformers
+huggingface-hub
+accelerate
+datasets
+tokenizers
+safetensors
+sentencepiece
+
+# PEFT and quantization
+peft
+bitsandbytes
+
+# DeepSpeed (compatible with PyTorch 2.0)
+deepspeed
+
+# Data processing and utilities
+numpy
+pandas
+scipy
+scikit-learn
+
+# Configuration and I/O
+pyyaml
+pyarrow
+pyarrow-hotfix
+
+# Networking and async
+aiohttp
+requests
+urllib3
+
+# Progress bars and CLI
+tqdm
+rich
+click
+
+# Additional ML utilities
+evaluate
+nltk
+
+# System and process management
+psutil
+py-cpuinfo
+
+# Distributed training helpers
+ninja
+packaging
+
+# Development tools (optional)
+black
+isort
+flake8
+pytest
+
+importlib_metadata

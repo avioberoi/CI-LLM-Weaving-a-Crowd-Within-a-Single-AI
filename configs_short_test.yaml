@@ -1,0 +1,37 @@
+# --- Model Configuration ---
+model_name: "google/gemma-2-2b"  # Use the SMALLER Gemma for a quick test
+num_agents: 2                    # K: Fewer agents
+use_gradient_checkpointing: True
+
+# --- LoRA Configuration ---
+lora_rank: 4
+lora_alpha: 8
+lora_dropout: 0.0
+lora_target_modules: ["q_proj", "v_proj"] # Fewer modules
+initialize_adapters_rand: False
+
+# --- CI-LLM Specific ---
+dropconnect_p: 0.0
+lambda_sw: 0.01            # Can keep this, or even 0.0 if just testing pipeline
+swd_num_projections: 10
+
+# --- Training Configuration ---
+epochs: 1
+batch_size: 1
+lr: 0.00005
+gradient_accumulation_steps: 1 # No accumulation for simplest test
+max_train_steps: 50            # <<-- KEY: Run only a few steps
+# num_warmup_steps_ratio: 0.0 # No warmup needed for very short run
+
+# --- Dataset and Tokenization ---
+dataset_name: "gsm8k"
+dataset_subset: "main"
+max_seq_length: 128            # Shorter sequence length for speed
+debug_subset_size: 32          # <<-- KEY: Use a very small subset of data
+
+# --- Checkpointing and Output ---
+output_dir: "ci_llm_gemma2_2b_SHORT_TEST_OUTPUT" # Separate output
+save_steps: 25                 # Save at least once during the short run
+logging_steps: 5               # Log frequently
+
+# ... (other params can be kept or simplified)

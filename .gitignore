@@ -1,0 +1,72 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+env/
+ENV/
+ci_llm_venv/
+cillm_env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# CI-LLM specific - NEVER track these large files
+# Checkpoint directories
+**/checkpoint_step_*/
+**/final_checkpoint/
+ci_llm_gemma*/
+ci_llm_*/
+
+# Model weights and binaries
+*.pth
+*.safetensors
+*.bin
+*.model
+
+# HuggingFace cache
+hf_cache/
+.cache/
+
+# Training outputs
+*.out
+*.err
+*.log
+slurm/
+
+# Evaluation results
+eval_results/
+
+# Downloaded assets
+git-lfs*/
+
+# Temporary files
+.DS_Store
+Thumbs.db
+*.tmp
+*.temp 
