@@ -18,9 +18,9 @@ from accelerate.logging import get_logger
 from accelerate.utils import set_seed, DeepSpeedPlugin
 from peft import get_peft_model_state_dict
 
-from models.gemma_backbone import CILLMModel
-from losses.sliced_w2 import SlicedWassersteinDiversityRegularizer
-from aggregator.dirichlet_bayesian import DirichletAggregator
+from src.models.gemma_backbone import CILLMModel
+from src.losses.sliced_w2 import SlicedWassersteinDiversityRegularizer
+from src.aggregator.dirichlet_bayesian import DirichletAggregator
 
 
 # Default configuration dictionary
@@ -145,7 +145,7 @@ def setup_logging(accelerator: Accelerator, output_dir: str) -> logging.Logger:
     return logger
 
 
-def load_config(config_path: str = "configs.yaml") -> Dict:
+def load_config(config_path: str = "configs/default.yaml") -> Dict:
     """
     Load configuration from YAML file or use defaults.
     

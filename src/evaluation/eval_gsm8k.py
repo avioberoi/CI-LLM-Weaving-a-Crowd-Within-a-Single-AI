@@ -3,12 +3,12 @@ import yaml
 import torch
 from datasets import load_dataset
 from transformers import AutoTokenizer, GenerationConfig
-from models.gemma_backbone import CILLMModel # Assuming CILLMModel is updated as discussed
-from aggregator.dirichlet_bayesian import DirichletAggregator
+from src.models.gemma_backbone import CILLMModel # Assuming CILLMModel is updated as discussed
+from src.aggregator.dirichlet_bayesian import DirichletAggregator
 # DataLoader is not strictly needed for GSM8K eval if processing one by one, but useful for batching
 # from torch.utils.data import DataLoader 
 
-def load_config(config_path="configs_eval.yaml"): # Separate eval config if desired
+def load_config(config_path="configs/eval.yaml"): # Separate eval config if desired
     if os.path.exists(config_path):
         with open(config_path, 'r') as f:
             return yaml.safe_load(f)

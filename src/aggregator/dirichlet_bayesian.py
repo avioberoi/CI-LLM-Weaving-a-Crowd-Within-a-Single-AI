@@ -54,21 +54,17 @@ class DirichletAggregator(nn.Module):
         if len(agent_outputs) != self.num_agents:
             raise ValueError(f"Expected {self.num_agents} agent outputs, but got {len(agent_outputs)}.")
 
-        # It's crucial that all tensors in agent_outputs are on the same device.
-        # Assuming they are, get device and dtype from the first tensor.
+.
         example_tensor = agent_outputs[0]
         batch_size = example_tensor.size(0)
         device = example_tensor.device
         dtype = example_tensor.dtype
 
-        # Stack outputs for easier computation: shape (batch_size, K, vocab_size)
         try:
             outputs = torch.stack(agent_outputs, dim=1) 
         except Exception as e:
-            # This might happen if tensors in the list have inconsistent shapes (other than vocab_size dim)
-            # or are on different devices.
+
             print(f"Error stacking agent_outputs: {e}")
-            # You might want to add more detailed shape/device checks here if issues persist
             for i, t in enumerate(agent_outputs):
                 print(f"Output {i} shape: {t.shape}, device: {t.device}, dtype: {t.dtype}")
             raise
@@ -76,7 +72,6 @@ class DirichletAggregator(nn.Module):
         if self.input_is_logits:
             outputs = outputs.softmax(dim=2) # Convert logits to probabilities
         else:
-            # If inputs are already probabilities, optionally check if they sum to 1 as a sanity check
             with torch.no_grad(): # No need for gradients in this check
                 prob_sums = outputs.sum(dim=2)
                 if not torch.allclose(prob_sums, torch.ones_like(prob_sums), atol=1e-3):

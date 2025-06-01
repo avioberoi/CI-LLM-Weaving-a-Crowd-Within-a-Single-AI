@@ -7,16 +7,16 @@ from pathlib import Path
 from typing import Dict, Optional
 
 # Add the project root to the Python path
-project_root = Path(__file__).parent
+project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 from transformers import AutoTokenizer
 from accelerate import Accelerator
 from accelerate.utils import set_seed
 from torch.utils.data import DataLoader, TensorDataset
-from models.gemma_backbone import CILLMModel
-from losses.sliced_w2 import SlicedWassersteinDiversityRegularizer
-from aggregator.dirichlet_bayesian import DirichletAggregator
+from src.models.gemma_backbone import CILLMModel
+from src.losses.sliced_w2 import SlicedWassersteinDiversityRegularizer
+from src.aggregator.dirichlet_bayesian import DirichletAggregator
 from torch import nn, optim
 from transformers import get_scheduler
 

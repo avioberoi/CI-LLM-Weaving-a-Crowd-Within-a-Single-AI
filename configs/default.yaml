@@ -148,7 +148,7 @@ profile_steps: 5                 # Profile first 5 steps
 log_memory_usage: true           # Log GPU memory usage
 
 # --- Reproducibility ---
-seed: 42                         # Random seed
+seed: 42   
 
 # --- Evaluation Configuration ---
 eval_batch_size: 2
