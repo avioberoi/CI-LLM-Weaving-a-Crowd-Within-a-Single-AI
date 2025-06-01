@@ -1,14 +1,10 @@
-# Evaluation Configuration for CI-LLM GSM8K
-# Based on the trained model at ci_llm_gemma2_2b_K4/final_checkpoint
-
-# --- Model Configuration ---
 model_name: "google/gemma-2-2b"
 num_agents: 4
 
-# --- LoRA Configuration (should match training config) ---
+# LoRA Configuration 
 lora_rank: 16
 lora_alpha: 32
-lora_dropout: 0.0  # No dropout during evaluation
+lora_dropout: 0.0   
 lora_target_modules:
   - "q_proj"
   - "k_proj"
@@ -18,31 +14,24 @@ lora_target_modules:
   - "up_proj"
   - "down_proj"
 
-# --- CI-LLM Specific ---
-dropconnect_p: 0.0  # No dropconnect during evaluation
+dropconnect_p: 0.0  
 
-# --- Checkpoint Configuration ---
+
 trained_peft_checkpoint_dir: "ci_llm_gemma2_2b_K4/checkpoint_step_600"
 
-# --- Dataset Configuration ---
 dataset_name: "gsm8k"
 dataset_subset: "main"
-max_seq_length_for_prompt: 400  # Leave room for generation
+max_seq_length_for_prompt: 400   
 
-# --- Generation Configuration ---
-max_new_tokens: 384  # Sufficient for GSM8K solutions
+max_new_tokens: 384  
 
-# --- Aggregator Configuration ---
 dirichlet_alpha_aggregator: 1.0
 
-# --- Output Configuration ---
 output_dir: "eval_results"
 output_file: "gsm8k_results.jsonl"
 
-# --- Evaluation Settings ---
-eval_batch_size: 1  # Process one example at a time for GSM8K
-debug_mode: true  # Set to true for quick testing with subset
-debug_subset_size: 1  # Number of examples to process in debug mode
+eval_batch_size: 1   
+debug_mode: true   
+debug_subset_size: 1  
 
-# --- Hardware/Memory ---
-mixed_precision: "bf16"  # Use same precision as training 
+mixed_precision: "bf16"  

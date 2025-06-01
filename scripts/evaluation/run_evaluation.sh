@@ -1,19 +1,12 @@
 #!/bin/bash
 
-# CI-LLM Evaluation Runner Script
-# This script helps you run the evaluation in the correct order
 
-echo "=============================================="
-echo "CI-LLM GSM8K Evaluation Setup"
-echo "=============================================="
 
-# Check if we're in the right directory
 if [ ! -f "eval_gsm8k.py" ]; then
-    echo "Error: Please run this script from the course-project-avi-oberoi directory"
+    echo "Error"
     exit 1
 fi
 
-# Check if checkpoint exists
 if [ ! -d "ci_llm_gemma2_2b_K4/final_checkpoint" ]; then
     echo "Error: Final checkpoint directory not found!"
     echo "Expected: ci_llm_gemma2_2b_K4/final_checkpoint"
@@ -25,12 +18,10 @@ echo "✓ Checkpoint directory found"
 
 # Check if config files exist
 if [ ! -f "configs_eval.yaml" ]; then
-    echo "Error: configs_eval.yaml not found!"
-    echo "Please make sure all necessary files are created."
+    echo "Error: configs_eval.yaml not found"
     exit 1
 fi
 
-echo "✓ Evaluation config found"
 
 echo ""
 echo "Available evaluation options:"
@@ -87,8 +78,3 @@ echo ""
 echo "=============================================="
 echo "Jobs submitted successfully!"
 echo ""
-echo "Useful commands:"
-echo "  Check job status: squeue -u $USER"
-echo "  Cancel job: scancel <job_id>"
-echo "  View results: ls -la eval_results/"
-echo "==============================================" 

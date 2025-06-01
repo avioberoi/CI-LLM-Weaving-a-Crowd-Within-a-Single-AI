@@ -1,9 +1,8 @@
-# --- Model Configuration ---
+# Model Configuration 
 model_name: "google/gemma-2-2b"
 num_agents: 4
 use_gradient_checkpointing: True
 
-# --- LoRA Configuration ---
 lora_rank: 16
 lora_alpha: 32
 lora_dropout: 0.05
@@ -17,59 +16,48 @@ lora_target_modules:
   - "down_proj"
 initialize_adapters_rand: True
 
-# --- CI-LLM Specific ---
 dropconnect_p: 0.05
 lambda_sw: 0.01
 swd_num_projections: 64
 
-# --- Training Configuration ---
 epochs: 3
 batch_size: 1
 lr: 3e-5
 gradient_accumulation_steps: 8
 num_warmup_steps_ratio: 0.03
-max_train_steps: null  # Full epoch training
+max_train_steps: null   
 
-# --- Dataset and Tokenization ---
-dataset_name: "data/hf_datasets/gsm8k_main"  # Updated for Spark preprocessing
+dataset_name: "data/hf_datasets/gsm8k_main" 
 dataset_subset: "main"
 max_seq_length: 512
 debug_subset_size: null
 
-# --- Spark Preprocessing Configuration ---
 spark:
   app_name_preprocess: "CI-LLM Data Preprocessing"
   driver_memory: "4g"
   executor_memory: "2g"
   executor_cores: 2
 
-# --- Data Paths ---
 processed_data_path_train: "data/processed/gsm8k_train.parquet"
 processed_data_path_eval: "data/processed/gsm8k_test.parquet"
 
-# --- Checkpointing and Output ---
 output_dir: "ci_llm_gemma2_2b_K4"
 save_steps: 2
 logging_steps: 10
 resume_from_checkpoint: null
 
-# --- DataLoader Configuration ---
-num_workers: 8  # Increase workers for throughput
+num_workers: 8   
 
-# --- Mixed Precision Training ---
 mixed_precision: "bf16"
 
-# --- Phase 2 / Full Train Features ---
 use_deepspeed: false
 deepspeed_config_file: "ds_config_zero2.json"
 parallel_mode: "parallel"
 profile_steps: null
 log_memory_usage: true
 
-# --- Reproducibility ---
 seed: 42
 
-# --- Evaluation Configuration ---
 eval_batch_size: 2
 max_new_tokens_eval: 384
 dirichlet_alpha_aggregator: 1.0 

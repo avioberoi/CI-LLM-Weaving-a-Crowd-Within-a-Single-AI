@@ -3,16 +3,15 @@ import yaml
 import torch
 from datasets import load_dataset
 from transformers import AutoTokenizer, GenerationConfig
-from src.models.gemma_backbone import CILLMModel # Assuming CILLMModel is updated as discussed
+from src.models.gemma_backbone import CILLMModel  
 from src.aggregator.dirichlet_bayesian import DirichletAggregator
-# DataLoader is not strictly needed for GSM8K eval if processing one by one, but useful for batching
-# from torch.utils.data import DataLoader 
 
-def load_config(config_path="configs/eval.yaml"): # Separate eval config if desired
+
+def load_config(config_path="configs/eval.yaml"):  
     if os.path.exists(config_path):
         with open(config_path, 'r') as f:
             return yaml.safe_load(f)
-    print(f"Warning: Evaluation config {config_path} not found. Using default eval config values")
+    print(f"Warning: Evaluation config {config_path} not found.")
 
 def parse_gsm8k_answer(generated_text_full: str, prompt_text: str) -> str:
     """
@@ -23,22 +22,15 @@ def parse_gsm8k_answer(generated_text_full: str, prompt_text: str) -> str:
     if generated_text_full.startswith(prompt_text):
         generated_answer_part = generated_text_full[len(prompt_text):].strip()
     else:
-        # Fallback if prompt isn't exactly at the start (e.g. due to special tokens)
-        # This might need more robust handling based on tokenizer behavior
-        generated_answer_part = generated_text_full # Assume it's mostly answer if prompt not found
+        generated_answer_part = generated_text_full  
 
-    # Standard GSM8K answer parsing: text after "####"
     if "####" in generated_answer_part:
         final_answer_text = generated_answer_part.split("####")[-1].strip()
     else:
-        # Fallback: try to extract a number from the end of the string if "####" is missing
-        # This is less reliable and often indicates a malformed generation.
         words = generated_answer_part.split()
         final_answer_text = words[-1] if words else ""
-        print(f"Warning: '####' not found in generated answer part: '{generated_answer_part}'. Using last word: '{final_answer_text}'")
+        print(f"Warning: '####' not found in generated answer part: '{generated_answer_part}'.")
 
-    # Clean the extracted numeric string (remove commas, units, etc.)
-    # Keep only digits, decimal point, and negative sign.
     cleaned_answer = "".join(filter(lambda char: char.isdigit() or char == '.' or char == '-', final_answer_text))
     
     # Remove trailing dots if any (e.g. "123.")
@@ -82,7 +74,7 @@ def main():
     checkpoint_dir = config['trained_peft_checkpoint_dir']
     if not os.path.exists(checkpoint_dir):
         raise FileNotFoundError(f"Checkpoint directory not found: {checkpoint_dir}")
-    print(f"✓ Checkpoint directory found: {checkpoint_dir}")
+    print(f"Checkpoint directory found: {checkpoint_dir}")
 
     # Initialize CI-LLM Model
     # It will load the base model internally and then load the PEFT adapters from the checkpoint_dir
@@ -90,15 +82,15 @@ def main():
     try:
         ci_model = CILLMModel(
             model_name=config['model_name'],
-            K=config['num_agents'], # This K should ideally match the K from the loaded checkpoint
-            lora_rank=config['lora_rank'], # These LoRA params are for structure if checkpoint_dir is None
+            K=config['num_agents'],  
+            lora_rank=config['lora_rank'],  
             lora_alpha=config['lora_alpha'],
-            lora_dropout=0.0, # Dropout is off during eval
-            dropconnect_p=0.0, # DropConnect is off during eval
+            lora_dropout=0.0,  
+            dropconnect_p=0.0,  
             target_modules=config['lora_target_modules'],
-            initialize_adapters_rand=False, # Not relevant when loading
-            use_gradient_checkpointing=False, # Not relevant for eval
-            trained_checkpoint_dir=config['trained_peft_checkpoint_dir'] # Key for loading
+            initialize_adapters_rand=False,  
+            use_gradient_checkpointing=False,  
+            trained_checkpoint_dir=config['trained_peft_checkpoint_dir'] 
         ).to(device)
     except Exception as e:
         print(f"Error initializing CILLMModel: {e}")
@@ -106,15 +98,15 @@ def main():
         traceback.print_exc()
         raise e
     
-    ci_model.eval() # Set model to evaluation mode
+    ci_model.eval()  
     print("CILLMModel initialized and set to evaluation mode.")
 
     # Initialize Aggregator
     try:
         aggregator = DirichletAggregator(
-            num_agents=ci_model.K, # Use K from the model, which might be adjusted if loaded from checkpoint
+            num_agents=ci_model.K,  
             alpha_val=config['dirichlet_alpha_aggregator'],
-            input_is_logits=True # CILLMModel.forward returns logits
+            input_is_logits=True  
         ).to(device)
         aggregator.eval()
         print("DirichletAggregator initialized.")
@@ -131,16 +123,10 @@ def main():
     if config.get('debug_mode', False):
         debug_size = config.get('debug_subset_size', 100)
         test_data = test_data.select(range(min(debug_size, len(test_data))))
-        print(f"🔧 DEBUG MODE: Processing only {len(test_data)} examples (subset size: {debug_size})")
+        print(f"Processing only {len(test_data)} examples (subset size: {debug_size})")
     else:
         print(f"Processing full dataset: {len(test_data)} examples")
     
-    # test_data = test_data.select(range(20)) # For quick testing of the eval loop
-
-    # Generation Configuration
-    # Ensure pad_token_id is set in the generation_config for the model
-    # CILLMModel's generate method will try to use self.peft_model.generation_config
-    # or create a default one. We can also pass one explicitly.
     generation_config = GenerationConfig(
         max_new_tokens=config['max_new_tokens'],
         pad_token_id=tokenizer.pad_token_id,
@@ -157,7 +143,7 @@ def main():
 
     print(f"Starting evaluation on {len(test_data)} examples...")
     for i, example in enumerate(test_data):
-        prompt_text = example["question"] # GSM8K prompts are just the questions
+        prompt_text = example["question"]  
         
         # Tokenize the prompt
         inputs = tokenizer(
@@ -171,7 +157,7 @@ def main():
             print(f"Warning: Prompt for example {i} was truncated.")
         
         full_generated_ids = None
-        with torch.no_grad(): # Ensure no gradients are computed during inference
+        with torch.no_grad():  
             try:
                 full_generated_ids = ci_model.generate(
                     input_ids=inputs["input_ids"],
@@ -186,10 +172,8 @@ def main():
                     "generated_text": "ERROR_DURING_GENERATION", "predicted_answer_parsed": "ERROR",
                     "gold_answer_parsed": get_gold_answer(example["answer"]), "correct": False
                 })
-                continue # Skip to next example
+                continue  
 
-        # Decode the full generated sequence (prompt + answer)
-        # The generate method in CILLMModel returns the full sequence including input_ids
         full_generated_text = tokenizer.decode(full_generated_ids[0], skip_special_tokens=True)
         
         predicted_answer_parsed = parse_gsm8k_answer(full_generated_text, prompt_text)

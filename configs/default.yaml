@@ -1,91 +1,12 @@
-# # --- Model Configuration ---
-# model_name: "google/gemma-2-9b"  # Full-size model for training
-# num_agents: 4                    # K: Number of CI-LLM agents (as per methodology example)
-# use_gradient_checkpointing: True # Essential for larger models to save memory
+model_name: "google/gemma-2-2b"   
+num_agents: 4                        
+use_gradient_checkpointing: True     
 
-# # --- LoRA Configuration (for each agent) ---
-# lora_rank: 16                    # Increased rank for potentially more capacity per adapter
-# lora_alpha: 32                   # Common practice: lora_alpha = 2 * lora_rank
-# lora_dropout: 0.05               # Standard LoRA path dropout for regularization
-# lora_target_modules:             # Comprehensive list for Gemma-like models
-#   - "q_proj"
-#   - "k_proj"
-#   - "v_proj"
-#   - "o_proj"
-#   - "gate_proj"
-#   - "up_proj"
-#   - "down_proj"
-# initialize_adapters_rand: True   # Encourage initial diversity among newly created adapters
-
-# # --- CI-LLM Specific Configuration ---
-# # DropConnect probability for LoRA A/B weights.
-# # Set to 0.0 for initial full runs to ensure stability and baseline performance.
-# # Can be experimented with (e.g., 0.05, 0.1) later if DropConnect mechanism is proven very robust.
-# dropconnect_p: 0.0
-
-# # Sliced Wasserstein Diversity (SWD) Regularization
-# lambda_sw: 0.01                  # Weight for the SWD term (to maximize diversity)
-#                                  # This value might need tuning based on loss scales.
-# swd_num_projections: 64          # More projections for better SWD estimate (e.g., 50-128)
-
-# # --- Training Configuration ---
-# epochs: 3                        # Number of training epochs (adjust based on dataset size & convergence)
-# batch_size: 1                    # Per-GPU batch size (QLoRA allows larger models, but K adapters add overhead)
-#                                  # Effective batch size = batch_size * gradient_accumulation_steps
-# lr: 0.00003                      # Learning rate (3e-5 is a common starting point for LLM fine-tuning)
-# gradient_accumulation_steps: 8   # Increase effective batch size (e.g., to 1*8=8 or higher)
-# # Optimizer params (AdamW defaults are generally good)
-# # adam_beta1: 0.9
-# # adam_beta2: 0.999
-# # adam_epsilon: 0.00000001 # 1e-8
-# weight_decay: 0.01               # Common weight decay for AdamW
-
-# # LR Scheduler params
-# lr_scheduler_type: "cosine"      # "linear", "cosine", "constant_with_warmup" etc.
-# num_warmup_steps_ratio: 0.03     # Percentage of total steps for warmup (e.g., 3% of total steps)
-#                                  # Actual num_warmup_steps will be calculated in train.py
-
-# # Set max_train_steps to null (or remove) for full epoch training on the cluster.
-# # For initial cluster tests, you might set it to a moderate number (e.g., 500, 1000).
-# max_train_steps: null
-
-# # --- Dataset and Tokenization ---
-# dataset_name: "gsm8k"
-# dataset_subset: "main"
-# max_seq_length: 768              # Increased sequence length for GSM8K problem complexity.
-#                                  # Monitor Gemma-2's context capabilities.
-# debug_subset_size: null          # Set to null or remove for full dataset training
-
-# # --- Checkpointing and Output ---
-# output_dir: "ci_llm_gemma2_9b_gsm8k_K4" # Descriptive output directory
-# save_steps: 200                  # Save a checkpoint every N global steps
-# logging_steps: 10                # Log training metrics every N global steps (for W&B or console)
-# resume_from_checkpoint: null     # Path to checkpoint directory to resume from
-
-# # --- DataLoader Configuration ---
-# num_workers: 4                   # Number of worker processes for data loading
-
-# # --- Mixed Precision Training ---
-# mixed_precision: "no"            # Options: "no", "fp16", "bf16" - bf16 often better for newer GPUs
-
-# # --- Evaluation (parameters for an eval script if it uses this config) ---
-# eval_batch_size: 2
-# max_new_tokens_eval: 384 # Allow more tokens for GSM8K solution steps
-# dirichlet_alpha_aggregator: 1.0
-
-# # --- Reproducibility ---
-# seed: 42 # Set in train.py for actual seeding
-
-# --- Model Configuration ---
-model_name: "google/gemma-3-4b-it"  # Using Gemma-3 4B instruct model
-num_agents: 4                        # K: Number of CI-LLM agents
-use_gradient_checkpointing: True     # Essential for larger models to save memory
-
-# --- LoRA Configuration (for each agent) ---
-lora_rank: 16                    # Increased rank for more capacity per adapter
-lora_alpha: 32                   # Common practice: lora_alpha = 2 * lora_rank
-lora_dropout: 0.05               # Standard LoRA path dropout for regularization
-lora_target_modules:             # Comprehensive list for Gemma models
+# LoRA Configuration  
+lora_rank: 16                     
+lora_alpha: 32                   
+lora_dropout: 0.05               
+lora_target_modules:              
   - "q_proj"
   - "k_proj"
   - "v_proj"
@@ -93,64 +14,56 @@ lora_target_modules:             # Comprehensive list for Gemma models
   - "gate_proj"
   - "up_proj"
   - "down_proj"
-initialize_adapters_rand: True   # Encourage initial diversity among newly created adapters
+initialize_adapters_rand: True    
 
-# --- CI-LLM Specific Configuration ---
-# DropConnect probability for LoRA A/B weights
-dropconnect_p: 0.0               # Start with 0.0 for stability, can experiment later
 
-# Sliced Wasserstein Diversity (SWD) Regularization
-lambda_sw: 0.01                  # Weight for the SWD term (to maximize diversity)
-swd_num_projections: 64          # More projections for better SWD estimate
+dropconnect_p: 0.0               
 
-# --- Training Configuration ---
-epochs: 3                        # Number of training epochs
-batch_size: 1                    # Per-GPU batch size (limited by memory)
-lr: 3e-5                         # Learning rate for fine-tuning
-gradient_accumulation_steps: 8   # Effective batch size = batch_size * num_gpus * grad_accum
-weight_decay: 0.01               # AdamW weight decay
+lambda_sw: 0.01                   
+swd_num_projections: 64           
+
+# Training Configuration 
+epochs: 3                        
+batch_size: 1                     
+lr: 3e-5                        
+gradient_accumulation_steps: 8    
+weight_decay: 0.01                
 
 # LR Scheduler params
-lr_scheduler_type: "cosine"      # Cosine annealing
-num_warmup_steps_ratio: 0.03     # 3% warmup
+lr_scheduler_type: "cosine"      
+num_warmup_steps_ratio: 0.03      
 
 # Training limits
-max_train_steps: null            # Set to null for full epoch training
+max_train_steps: null           
 
-# --- Dataset and Tokenization ---
 dataset_name: "gsm8k"
 dataset_subset: "main"
-max_seq_length: 768              # Increased for GSM8K problem complexity
-debug_subset_size: null          # Set to null for full dataset
+max_seq_length: 768               
+debug_subset_size: null           
 
-# --- Checkpointing and Output ---
-output_dir: "ci_llm_gemma3_4b_gsm8k_K4"  # Descriptive output directory
-save_steps: 200                  # Save checkpoint every N steps
-logging_steps: 10                # Log metrics every N steps
-resume_from_checkpoint: null     # Path to checkpoint directory to resume from
+output_dir: "ci_llm_gemma3_4b_gsm8k_K4"  
+save_steps: 200                  
+logging_steps: 10                 
+resume_from_checkpoint: null      
 
-# --- DataLoader Configuration ---
-num_workers: 4                   # Number of worker processes for data loading
+num_workers: 4                  
 
-# --- Mixed Precision Training ---
-mixed_precision: "bf16"          # Use bf16 for better stability on newer GPUs
+mixed_precision: "bf16"          
 
-# --- Phase 2 Features ---
-# DeepSpeed Integration
-use_deepspeed: true              # Enable DeepSpeed optimization
-deepspeed_config_file: "ds_config_zero2.json"  # Use our ZeRO-2 config
 
-# Parallel Agent Processing
-parallel_mode: "parallel"        # Use parallel agent execution
+use_deepspeed: true             
+deepspeed_config_file: "ds_config_zero2.json"  
+
+parallel_mode: "parallel"         
 
 # Profiling
-profile_steps: 5                 # Profile first 5 steps
-log_memory_usage: true           # Log GPU memory usage
+profile_steps: 5                  
+log_memory_usage: true            
 
-# --- Reproducibility ---
+
 seed: 42   
 
-# --- Evaluation Configuration ---
+# Evaluation Configuration 
 eval_batch_size: 2
-max_new_tokens_eval: 384         # Allow more tokens for GSM8K solutions
+max_new_tokens_eval: 384        
 dirichlet_alpha_aggregator: 1.0
