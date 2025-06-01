@@ -16,9 +16,9 @@ This repository details the design, implementation, and scalable computing strat
 
 ## Table of Contents
 
-1. [The Social Science Problem](#the-social-science-problem)
+1. [The Problem](#the-problem)
 2. [The Vision: CI-LLM Architecture](#the-vision-ci-llm-architecture)
-3. [Scalable Computing Justification](#scalable-computing-justification)
+3. [Scalable Computing](#scalable-computing)
 4. [Technical Implementation](#technical-implementation)
 5. [Project Structure](#project-structure)
 6. [Results and Analysis](#results-and-analysis)
@@ -29,7 +29,7 @@ This repository details the design, implementation, and scalable computing strat
 
 ---
 
-## The Social Science Problem
+## The Problem
 
 ### The Challenge: Moving Beyond Single-Perspective AI
 
@@ -39,7 +39,7 @@ Large Language Models (LLMs) like the Gemma series have demonstrated remarkable 
 - **Entrenched Biases**: Reflecting dominant narratives from training data without surfacing alternative, valid viewpoints
 - **Difficulty in Representing True Nuance**: While models can be prompted for different personas, their core reasoning pathways may converge or struggle to balance genuinely conflicting information
 
-### The Social Science Question
+### The Question
 
 Can we create an LLM that doesn't just mimic different perspectives when prompted, but actually fosters a form of **internal collective intelligence**? Can we build an AI that benefits from the "wisdom of crowds" by having multiple, somewhat independent, diverse "agents" or reasoning pathways within its own structure?
 
@@ -56,7 +56,7 @@ Our core hypothesis is that by explicitly designing an LLM architecture that emb
 The CI-LLM framework consists of:
 
 #### 1. **Shared Backbone LLM**
-- **Current Implementation**: Google Gemma-2-2B (configurable to other Gemma-2 variants)
+- **Current Implementation**: Google Gemma-2-2B (configurable to other LLMs)
 - **Quantization**: 4-bit quantization via QLoRA for memory efficiency
 - **Status**: Backbone weights remain frozen during CI-specific training to conserve resources
 
@@ -91,14 +91,14 @@ The CI-LLM framework consists of:
 
 ---
 
-## Scalable Computing Justification
+## Scalable Computing
 
 ### The Computational Challenge
 
 Training CI-LLM presents significant computational challenges that necessitate high-performance computing infrastructure across both data preprocessing and model training phases:
 
 #### 1. **Model Scale Complexity**
-- **Base Model**: Gemma-2-2B has 2 billion parameters (currently deployed)
+- **Base Model**: Gemma-2-2B has 2 billion parameters (currently deployed, experimented with Gemma3-12B as well)
 - **Multi-Agent Training**: K=4 agents with independent LoRA adapters
 - **Memory Requirements**: Even with 4-bit quantization, multi-agent training requires substantial VRAM
 - **Training Time**: Diversity regularization and ensemble training significantly increase computational overhead
@@ -114,18 +114,18 @@ Training CI-LLM presents significant computational challenges that necessitate h
 **Memory Constraints:**
 - Standard GPUs cannot accommodate the memory requirements for multi-agent training
 - DeepSpeed ZeRO-2 optimization enables sharding of optimizer states and gradients across multiple GPUs
-- Enables training of larger Gemma-2 variants with K=4+ agents on 40GB A100s
+- Enables training of larger LLM with K=4+ agents on 40GB A100s
 - **Distributed Data Processing**: Apache Spark distributes tokenization workload across cluster nodes to handle large-scale datasets
 
 **Training Efficiency:**
-- Distributed training across multiple GPUs reduces training time from weeks to days
+- Distributed training across multiple GPUs reduces training time from weeks to days (still talking days)
 - Gradient accumulation and mixed precision training optimize memory usage
 - Parallel agent processing (Phase 2 implementation) reduces adapter switching overhead
 - **Preprocessing Pipeline**: Spark-based preprocessing eliminates bottlenecks in data loading and tokenization
 
 **Scalability for Research:**
 - Ability to experiment with larger K values (more agents)
-- Support for larger base models (Gemma-2-9B and beyond)
+- Support for larger base models (Gemma-3-12B and beyond)
 - Multi-node training capabilities for future scaling
 - **Dataset Scalability**: Spark preprocessing scales to datasets with millions of samples without memory constraints
 
@@ -256,7 +256,7 @@ Our evaluation on GSM8K revealed **0% accuracy across 20 test samples**, indicat
 
 ```bash
 # Clone repository
-git clone <repository-url>
+git clone https://github.com/avioberoi/CI-LLM-Weaving-a-Crowd-Within-a-Single-AI.git
 cd course-project-avi-oberoi-clean
 
 # Create conda environment
@@ -493,21 +493,6 @@ accelerate launch --num_machines 2 --machine_rank 0 \
 
 ---
 
-## Key Features Summary
-
-- **Multi-Agent Architecture**: K independent QLoRA adapters with shared backbone
-- **Diversity Regularization**: Sliced-Wasserstein distance for agent diversity
-- **Bayesian Aggregation**: Dirichlet-weighted token-level prediction fusion
-- **Distributed Data Preprocessing**: Apache Spark-based parallel tokenization and format conversion
-- **Memory Optimization**: DeepSpeed ZeRO-2 for large model training
-- **Distributed Training**: Accelerate integration for multi-GPU setups
-- **Parallel Processing**: Prototype parallel agent execution
-- **Robust Checkpointing**: Resume training from any point
-- **Comprehensive Testing**: Full system validation and profiling
-- **Scalable Data Pipeline**: Fault-tolerant preprocessing with automatic schema inference
-
----
-
 ## Citation
 
 If you use this code in your research, please cite:
@@ -518,7 +503,7 @@ If you use this code in your research, please cite:
   author={Oberoi, Avi and Abenezer},
   year={2024},
   institution={University of Chicago},
-  url={https://github.com/macs30200-s23/course-project-avi-oberoi}
+  url={https://github.com/avioberoi/CI-LLM-Weaving-a-Crowd-Within-a-Single-AI.git}
 }
 ```
 
@@ -531,8 +516,6 @@ If you use this code in your research, please cite:
 - Hu, E. J., et al. (2022). LoRA: Low-Rank Adaptation of Large Language Models. *ICLR*
 - Page, S. (2008). *The Difference: How the Power of Diversity Creates Better Groups*
 - Surowiecki, J. (2005). *The Wisdom of Crowds*
-- Team, G., et al. (2024). Gemma 2 Technical Report
+- Team, G., et al. (2024). Gemma 3 Technical Report
 
 ---
-
-*For detailed technical documentation, see `docs/README.md` and related documentation files.* 
